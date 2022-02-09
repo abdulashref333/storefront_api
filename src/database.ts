@@ -10,26 +10,27 @@ const {
   POSTGRES_DB_TEST,
   POSTGRES_USER,
   POSTGRES_PASSWORD,
+  POSTGRES_TEST_USER,
 } = process.env;
 
 // client it's the connection to the postgres or just a collection of many connections.
 // it's a pool of ready threads.
-let client: any;
+let client: Pool;
 
 if (ENV === "dev") {
+  console.log("i am here.");
+
   client = new Pool({
     host: POSTGRES_HOST,
     database: POSTGRES_DB,
     user: POSTGRES_USER,
     password: POSTGRES_PASSWORD,
   });
-}
-
-if (ENV === "test") {
+} else {
   client = new Pool({
     host: POSTGRES_HOST,
     database: POSTGRES_DB_TEST,
-    user: POSTGRES_USER,
+    user: POSTGRES_TEST_USER,
     password: POSTGRES_PASSWORD,
   });
 }

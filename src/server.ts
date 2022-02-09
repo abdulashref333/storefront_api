@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
+import routes from "./routes/index";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // routes
+app.use("/api", routes);
 
 app.listen(port, () => {
   console.log(`server is running on http://localhost:${port}/`);

@@ -6,14 +6,16 @@
 - note every class named with singular because it's represents an instace of object or a row on db.
 */
 import Client from "../database";
+import Queries from "../queries";
+import { IModel } from "../controller/handlerFactory";
 
 export type Book = {
-  id: Number;
+  id?: Number;
   title: string;
   author: string;
-  type: string;
-  summary: string;
-  total_pages: number;
+  type?: string;
+  summary?: string;
+  total_pages?: number;
 };
 
 /*
@@ -23,25 +25,26 @@ export type Book = {
   - after each connection you should realse or close
 */
 
-// TODO: extract the sql queries out of this file.
+// TODO: .
 
-export class BookStore {
+export class BookStore implements IModel<Book> {
+  creat(obj: Book): Promise<Book> {
+    throw new Error("Method not implemented.");
+  }
   async index(): Promise<Book[]> {
     try {
       const cn = await Client.connect();
-      const sql = `SELECT * FROM books;`;
-      const result = await cn.query(sql);
+      const result = await cn.query(Queries.GET_ALL_BOOKS);
       cn.release();
       return result.rows;
     } catch (error) {
       throw new Error(`Could not get books ${error}`);
     }
   }
-  async show(id: string): Promise<Book> {
+  async show(id: number): Promise<Book> {
     try {
       const cn = await Client.connect();
-      const sql = `SELECT * FROM books WHERE id=($1)`;
-      const result = await cn.query(sql, [id]);
+      const result = await cn.query(Queries.GET_BOOK_BY_ID, [id]);
       cn.release();
       const book_result = result.rows[0];
       return book_result;
@@ -52,8 +55,7 @@ export class BookStore {
   async create(book: Book): Promise<Book> {
     try {
       const cn = await Client.connect();
-      const sql = `INSERT INTO books(title, author, type, summary, total_pages) VALUES($1, $2, $3, $4, $5);`;
-      const result = await cn.query(sql, [
+      const result = await cn.query(Queries.CREATE_BOOK, [
         book.title,
         book.author,
         book.type,
@@ -72,8 +74,7 @@ export class BookStore {
     try {
       const input = [id, "test"];
       const cn = await Client.connect();
-      const sql = `UPDATE books set title = $2 WHERE id=($1) ;`;
-      const result = await cn.query(sql, input);
+      const result = await cn.query(Queries.UPDATE_BOOK_TITLE, input);
       cn.release();
       const book = result.rows[0];
       return book;
@@ -85,8 +86,7 @@ export class BookStore {
   async delete(id: number): Promise<Book> {
     try {
       const cn = await Client.connect();
-      const sql = `DELETE FROM books WHERE id = $1;`;
-      const result = await cn.query(sql, [id]);
+      const result = await cn.query(Queries.DELETE_BOOK, [id]);
       cn.release();
       const book = result.rows[0];
       return book;
